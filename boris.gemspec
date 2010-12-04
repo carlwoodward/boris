@@ -11,7 +11,6 @@ Gem::Specification.new do |gem|
   gem.summary = "Super simple server provising/management"
   gem.description = "Really easy server management"
   gem.has_rdoc = false
-  gem.files = %w(Readme.md Rakefile) + Dir.glob("{lib}/**/*")
+  gem.files = %w(README.markdown Rakefile) + Dir.glob("{lib}/**/*")
   gem.require_path = "lib"
-  gem.executables = [ 'boris' ]
 end
