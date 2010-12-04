@@ -60,8 +60,8 @@ module Borisify
     "echo #{current_password} | sudo -S #{command}"
   end
   
-  def expect(test)
-    method_name = parse_caller(caller[0]).last
+  def expect(test, name=nil)
+    method_name = name || parse_caller(caller[0]).last
     if test
       puts "#{method_name} - PASS"
       return true
