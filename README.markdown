@@ -1,5 +1,7 @@
 # Boris - Because Boris can't cook!
 
+__Boris in the really early stages of development. Use at your own risk.__
+
 Boris is a small simple devops management gem. All config can be done in one file. Sharing deployment packages is as simple as requiring a file and including the module.
 
 Lets look at some code:
