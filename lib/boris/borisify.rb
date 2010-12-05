@@ -124,7 +124,9 @@ module Commands
   end
   
   def run(cmd)
-    ssh.exec! cmd
+    result = ssh.exec! cmd
+    puts result
+    result
   end
   
   def run_sudo(cmd)
