@@ -124,6 +124,13 @@ module Commands
   end
   
   def run(cmd)
+    if @directories && @directories.any?
+      if cmd.match(';') # must be using sudo
+        cmd.sub!(';', "; cd #{@directories.last}; ")
+      else
+        cmd = "cd #{@directories.last}; " + cmd
+      end
+    end
     result = ssh.exec! cmd
     puts result
     result
@@ -147,8 +154,8 @@ module Commands
   end
   
   def in_directory(path)
-    run "cd #{path}"
+    (@directories ||= []).push(path)
     yield
-    run "cd ~"
+    @directories.pop
   end
 end

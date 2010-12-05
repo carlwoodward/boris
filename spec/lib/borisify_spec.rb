@@ -48,11 +48,10 @@ describe 'servers' do
   
   it "should move directories" do # NOTE: no sudo
     test_connection_is_working
-    @connection.should_receive(:exec!).with("cd /usr/local")
-    @connection.should_receive(:exec!).with("cd ~")
+    @connection.should_receive(:exec!).with("cd /usr/local; ls -la")
     setup :test do
       in_directory("/usr/local") do
-        ;
+        run 'ls -la'
       end
     end
   end
