@@ -48,9 +48,11 @@ module Borisify
       boris.servers[role].each do |details|
         ip, user, password = details[:ip_address], details[:user], details[:password]
         Net::SSH.start ip, user, :password => password do |connection|
-          self.current_connection = connection
-          self.current_password = password
-          yield(role)
+          connection.request_pty do |channel, success|
+            self.current_connection = channel
+            self.current_password = password
+            yield(role)
+          end
         end
       end
     end
