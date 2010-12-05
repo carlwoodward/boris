@@ -91,11 +91,11 @@ module Commands
   end
   
   def apt_get_update
-    expect(run_sudo("apt-get update").include?('Done'))
+    expect(run_sudo("yes | apt-get update").include?('Done'))
   end
   
   def apt_get_install(command)
-    expect(run_sudo("apt-get install #{command}").include?('installed'))
+    expect(run_sudo("yes | apt-get install #{command}").include?('installed'))
   end
   
   def restart_apache
