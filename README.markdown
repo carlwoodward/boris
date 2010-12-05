@@ -7,7 +7,7 @@ Boris is a small simple devops management gem. All config can be done in one fil
 Lets look at some code:
 
     add_server :test, '123.123.123.123', 'deploy', 'test'
-    setup :staging, :live do
+    setup :staging, :live do |role|
       # Web Server
       apt_get_install 'nginx'
       write_config 'nginx', '/etc/nginx/nginx.conf', :locals => {:server_name => 'test.com', :root => '/somewhere/public'}

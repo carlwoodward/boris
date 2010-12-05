@@ -50,7 +50,7 @@ module Borisify
         Net::SSH.start ip, user, :password => password do |connection|
           self.current_connection = connection
           self.current_password = password
-          yield
+          yield(role)
         end
       end
     end
