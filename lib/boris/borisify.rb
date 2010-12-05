@@ -147,8 +147,8 @@ module Commands
   end
   
   def in_directory(path)
-    run "cd #{path}"
+    ssh.cd(path)
     yield
-    run "cd ~"
+    ssh.cd('~')
   end
 end
