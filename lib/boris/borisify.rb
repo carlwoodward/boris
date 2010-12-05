@@ -28,7 +28,7 @@ module Borisify
   end
   
   def current_connection=(connection)
-    @current_connection = connection
+    @current_connection = connection.shell.open
   end
   
   def current_password=(password)
