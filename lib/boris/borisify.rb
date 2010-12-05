@@ -28,7 +28,7 @@ module Borisify
   end
   
   def current_connection=(connection)
-    @current_connection = connection.shell.open
+    @current_connection = connection
   end
   
   def current_password=(password)
@@ -147,8 +147,8 @@ module Commands
   end
   
   def in_directory(path)
-    ssh.cd(path)
+    run "cd #{path}"
     yield
-    ssh.cd('~')
+    run "cd ~"
   end
 end
