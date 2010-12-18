@@ -26,7 +26,7 @@ describe 'servers' do
     @connection.should_receive(:exec!).with("echo test | sudo -S ls /etc/nginx/nginx.conf").twice.and_return("No such file or directory")
     @connection.should_receive(:exec!).with("echo test | sudo -S cat /etc/nginx/nginx.conf").and_return(file_data)
     setup :test do
-      write_config 'nginx', '/etc/nginx/nginx.conf'
+      write_config 'nginx', '/etc/nginx/nginx.conf', {:test_var => 'test'}
     end
   end
   

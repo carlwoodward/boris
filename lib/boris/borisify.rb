@@ -2,10 +2,11 @@ require 'net/ssh'
 require 'erb'
 
 class Boris
-  attr_accessor :servers, :configs_path
+  attr_accessor :servers, :configs_path, :env_path
   
   def initialize
     self.servers = {}
+    self.env_path = ''
   end
 end
 
@@ -39,6 +40,14 @@ module Borisify
     @current_password
   end
   
+  def env_path(path)
+    boris.env_path = path
+  end
+  
+  def set_path
+    boris.env_path == '' ? '' : "export PATH=#{boris.env_path}; "
+  end
+  
   def ssh
     @current_connection
   end
@@ -48,11 +57,9 @@ module Borisify
       boris.servers[role].each do |details|
         ip, user, password = details[:ip_address], details[:user], details[:password]
         Net::SSH.start ip, user, :password => password do |connection|
-          connection.request_pty do |channel, success|
-            self.current_connection = channel
-            self.current_password = password
-            yield(role)
-          end
+          self.current_connection = connection
+          self.current_password = password
+          yield(role)
         end
       end
     end
@@ -109,7 +116,7 @@ module Commands
   end
   
   def backup_file(path)
-    run_sudo "cp #{path} #{path}#{Time.now.to_i}"
+    run_sudo "mv #{path} #{path}#{Time.now.to_i}"
   end
   
   def write_config(file, output_location, locals={})
@@ -119,27 +126,10 @@ module Commands
     unless has_file?(output_location) && file_contents_equal(output_location, result)
       backup_file(output_location) if has_file?(output_location)
       lines.each do |line|
-        run_sudo "echo '#{line}' >> #{output_location}"
+        run "echo '#{line}' >> #{output_location}"
       end
     end
-    expect(file_contents_equal(output_location, result))
-  end
-  
-  def run(cmd)
-    if @directories && @directories.any?
-      if cmd.match(';') # must be using sudo
-        cmd.sub!(';', "; cd #{@directories.last}; ")
-      else
-        cmd = "cd #{@directories.last}; " + cmd
-      end
-    end
-    result = ssh.exec! cmd
-    puts result
-    result
-  end
-  
-  def run_sudo(cmd)
-    run sudo(cmd)
+    # expect(file_contents_equal(output_location, result))
   end
   
   # BORROWED FROM: https://github.com/bmizerany/sinatra/commit/dc6e32a5cea29e9055463f6eff84f2b829a19c1c
@@ -151,8 +141,30 @@ module Commands
       locals_code << "#{key} = locals_hash[:#{key}]\n"
       locals_hash[:"#{key}"] = value
     end
-    Kernel.eval("#{locals_code}", binding)
-    binding
+    Kernel.eval("#{locals_code}", outer)
+    outer
+  end
+  
+  def wrap_path(cmd)
+    set_path + cmd
+  end
+  
+  def run(cmd)
+    if @directories && @directories.any?
+      if cmd.match(';') # must be using sudo
+        cmd.sub!(';', "; cd #{@directories.last}; ")
+      else
+        cmd = "cd #{@directories.last}; " + cmd
+      end
+    end
+    puts "RUNNING CMD: #{wrap_path(cmd)}"
+    result = ssh.exec! wrap_path(cmd)
+    puts result
+    result
+  end
+  
+  def run_sudo(cmd)
+    run sudo(cmd)
   end
   
   def in_directory(path)
